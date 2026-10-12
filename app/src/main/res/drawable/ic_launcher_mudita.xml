@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solitaire: launcher icon in the Mudita Kompakt stock style (81 grid, ring r=19.25 x 2.5,
+     glyph stroke 2.5, black on transparent): two fanned cards, a solid spade on the front one.
+     Built by ~/Desktop/icons/solitaire/mudita/make.py. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="81dp"
+    android:height="81dp"
+    android:viewportWidth="81"
+    android:viewportHeight="81">
+    <path
+        android:pathData="M19.25,2.5C9.999,2.5 2.5,9.999 2.5,19.25V61.75C2.5,71.001 9.999,78.5 19.25,78.5H61.75C71.001,78.5 78.5,71.001 78.5,61.75V19.25C78.5,9.999 71.001,2.5 61.75,2.5H19.25ZM0,19.25C0,8.619 8.619,0 19.25,0H61.75C72.382,0 81,8.619 81,19.25V61.75C81,72.382 72.382,81 61.75,81H19.25C8.619,81 0,72.382 0,61.75V19.25Z"
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"/>
+    <path android:pathData="M38.607,24.145 L39.286,24.045 L39.971,24.079 L40.637,24.247 L41.257,24.541 L41.807,24.950 L42.268,25.459 L42.620,26.048 L42.850,26.694 L48.172,48.041 L48.272,48.719 L48.238,49.405 L48.070,50.070 L47.776,50.690 L47.367,51.241 L46.858,51.701 L46.269,52.053 L45.623,52.283 L32.039,55.670 L31.360,55.770 L30.675,55.736 L30.009,55.568 L29.390,55.274 L28.839,54.865 L28.379,54.356 L28.027,53.767 L27.796,53.121 L22.474,31.774 L22.374,31.096 L22.408,30.410 L22.576,29.745 L22.870,29.125 L23.279,28.574 L23.788,28.114 L24.377,27.762 L25.023,27.532 Z" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M55.735,28.343 L56.395,28.528 L57.007,28.838 L57.547,29.262 L57.994,29.783 L58.330,30.381 L58.544,31.033 L58.626,31.714 L58.574,32.398 L54.753,54.064 L54.569,54.724 L54.259,55.337 L53.835,55.876 L53.314,56.323 L52.716,56.660 L52.064,56.873 L51.383,56.955 L50.699,56.903 L36.912,54.472 L36.251,54.287 L35.639,53.977 L35.099,53.553 L34.652,53.032 L34.316,52.435 L34.102,51.782 L34.020,51.101 L34.073,50.417 L37.893,28.751 L38.078,28.091 L38.388,27.479 L38.811,26.939 L39.332,26.492 L39.930,26.156 L40.582,25.942 L41.263,25.860 L41.947,25.912 Z" android:fillColor="#FFFFFFFF" android:strokeColor="#FF000000" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M47.148,36.730 C48.128,38.832 51.298,40.548 50.902,42.794 C50.506,45.039 47.072,44.819 46.307,43.141 L46.995,46.349 L44.001,45.821 L45.746,43.042 C44.452,44.358 41.150,43.389 41.546,41.144 C41.942,38.899 45.508,38.370 47.148,36.730 Z" android:fillColor="#FF000000"/>
+</vector>

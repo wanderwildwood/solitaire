@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Solitaire</string>
+
+    <!-- Read aloud by a screen reader -->
+    <string name="cd_back">Back</string>
+    <string name="cd_about">About</string>
+    <string name="cd_settings">Settings</string>
+
+    <!-- ============================================================ -->
+    <!-- The games, by name -->
+
+    <string name="klondike">Klondike</string>
+    <string name="freecell">FreeCell</string>
+    <string name="spider">Spider</string>
+    <!-- The title over a FreeCell game. %1$s is the deal number -->
+    <string name="freecell_deal">FreeCell %1$s</string>
+
+    <!-- Under a game's name in the list, when one is under way. %1$s is a count of moves -->
+    <string name="in_progress">Under way, %1$s</string>
+
+    <plurals name="moves">
+        <item quantity="one">%1$s move</item>
+        <item quantity="other">%1$s moves</item>
+    </plurals>
+
+    <!-- ============================================================ -->
+    <!-- Playing -->
+
+    <string name="undo">Undo</string>
+    <string name="finish">Finish</string>
+    <string name="new_game">New game</string>
+    <string name="new_game_armed">New game — tap again</string>
+    <string name="same_deal">Same deal</string>
+    <!-- FreeCell: choose a numbered deal. Kept short, it is a button -->
+    <string name="deal_number">Deal #</string>
+    <!-- %1$s is a count of moves, already worded: "84 moves" -->
+    <string name="won_in">Won in %1$s</string>
+    <string name="fill_columns_first">Every column needs a card before the next deal.</string>
+
+    <string name="deal_title">Deal number</string>
+    <string name="deal_hint">1 to 32000</string>
+    <string name="deal_out_of_range">Deals run from 1 to 32000.</string>
+    <string name="deal_go">Deal</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- What a screen reader says for a card. %1$s is the rank, %2$s the suit -->
+    <string name="card">%1$s of %2$s</string>
+    <string name="card_face_down">Face down</string>
+    <string name="rank_1">Ace</string>
+    <string name="rank_2">Two</string>
+    <string name="rank_3">Three</string>
+    <string name="rank_4">Four</string>
+    <string name="rank_5">Five</string>
+    <string name="rank_6">Six</string>
+    <string name="rank_7">Seven</string>
+    <string name="rank_8">Eight</string>
+    <string name="rank_9">Nine</string>
+    <string name="rank_10">Ten</string>
+    <string name="rank_11">Jack</string>
+    <string name="rank_12">Queen</string>
+    <string name="rank_13">King</string>
+    <string name="suit_clubs">clubs</string>
+    <string name="suit_diamonds">diamonds</string>
+    <string name="suit_hearts">hearts</string>
+    <string name="suit_spades">spades</string>
+    <string name="pile_stock">Stock</string>
+    <string name="pile_empty">Empty</string>
+    <!-- Spider: how many runs have been completed. %1$s is the count -->
+    <string name="runs_done">%1$s of 8 runs done</string>
+
+    <!-- The letters printed in a card's corner. Ten is two digits on purpose -->
+    <string name="corner_1">A</string>
+    <string name="corner_11">J</string>
+    <string name="corner_12">Q</string>
+    <string name="corner_13">K</string>
+
+    <!-- ============================================================ -->
+    <!-- Settings -->
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_draw">Klondike draws</string>
+    <string name="settings_draw_1">One card at a time</string>
+    <string name="settings_draw_3">Three cards at a time</string>
+    <string name="settings_suits">Spider plays with</string>
+    <string name="settings_suits_1">One suit</string>
+    <string name="settings_suits_2">Two suits</string>
+    <string name="settings_suits_4">Four suits</string>
+    <string name="settings_next_game">A change takes effect from the next new game.</string>
+    <string name="settings_counts">Played and won</string>
+    <!-- %1$s is the game's name, %2$s games played, %3$s games won -->
+    <string name="settings_count_row">%1$s: played %2$s, won %3$s</string>
+
+    <!-- ============================================================ -->
+    <!-- About -->
+
+    <string name="about_title">Solitaire %1$s</string>
+    <string name="about_what">Klondike, FreeCell and Spider. FreeCell deals are numbered as Microsoft numbered them.</string>
+    <string name="about_licence">GNU General Public License v3</string>
+    <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
+    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+    <string name="about_close">Close</string>
+</resources>
