@@ -65,6 +65,7 @@
     <string name="suit_hearts">hearts</string>
     <string name="suit_spades">spades</string>
     <string name="pile_stock">Stock</string>
+    <string name="runs_count">× %1$d</string>
     <string name="pile_empty">Empty</string>
     <!-- Spider: how many runs have been completed. %1$s is the count -->
     <string name="runs_done">%1$s of 8 runs done</string>

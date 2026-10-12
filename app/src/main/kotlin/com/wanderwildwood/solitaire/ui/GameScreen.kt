@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -317,9 +318,17 @@ private fun TableView(
                 Homes(board, 4, ::colX, topY, s, emptyName, onTap)
             }
             Kind.SPIDER -> {
-                // Completed runs on the left, each shown by its king; the deals left on the right.
-                board.homes.forEachIndexed { k, run ->
-                    CardView(run.first(), colX(0) + 9.dp * k, topY, s, "h${k}_0", whole = k == board.homes.lastIndex, onTap = null)
+                // Completed runs on the left, one king and how many; the deals left on the right.
+                if (board.homes.isNotEmpty()) {
+                    val k = board.homes.lastIndex
+                    CardView(board.homes[k].first(), colX(0), topY, s, "h${k}_0", whole = true, onTap = null)
+                    if (k > 0) {
+                        TextMMD(
+                            text = stringResource(R.string.runs_count, k + 1),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.offset(colX(1), topY + s.cardH / 2 - 12.dp).testTag("runs"),
+                        )
+                    }
                 }
                 val deals = board.stock.size / 10
                 for (k in 0 until deals) {
