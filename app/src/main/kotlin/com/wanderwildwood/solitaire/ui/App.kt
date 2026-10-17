@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.solitaire.R
@@ -144,7 +143,7 @@ private fun HomeScreen(store: Store, onPick: (Kind) -> Unit, onSettings: () -> U
             )
         },
     ) { padding ->
-        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.padding(padding).fillMaxSize()) {
             for (kind in Kind.entries) {
                 item(key = kind.name) {
                     val saved = remember { store.game(kind) }
@@ -196,7 +195,7 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
             )
         },
     ) { padding ->
-        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+        PagedColumn(Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
             item { Spacer(Modifier.height(8.dp)) }
             item(key = "draw") { SettingRow(stringResource(R.string.settings_draw), drawNames[draw]) { pickDraw = true } }
             item(key = "suits") { SettingRow(stringResource(R.string.settings_suits), suitNames[suits]) { pickSuits = true } }
@@ -213,7 +212,6 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
                     )
                 }
             }
-            item { Spacer(Modifier.height(24.dp)) }
         }
     }
 
