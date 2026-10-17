@@ -87,7 +87,7 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = title, fontWeight = FontWeight.Bold, maxLines = 1) },
+                title = { TextMMD(text = title, maxLines = 1) },
                 navigationIcon = { BarButton(Icons.Back, stringResource(R.string.cd_back), onBack) },
                 actions = {
                     TextMMD(

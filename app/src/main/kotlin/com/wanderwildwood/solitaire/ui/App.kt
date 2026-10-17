@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -140,7 +139,7 @@ private fun HomeScreen(store: Store, onPick: (Kind) -> Unit, onSettings: () -> U
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
+                title = { TextMMD(text = stringResource(R.string.app_name)) },
                 actions = { BarButton(Icons.Settings, stringResource(R.string.cd_settings), onSettings) },
             )
         },
@@ -191,7 +190,7 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBarMMD(
-                title = { TextMMD(text = stringResource(R.string.settings_title), fontWeight = FontWeight.Bold) },
+                title = { TextMMD(text = stringResource(R.string.settings_title)) },
                 navigationIcon = { BarButton(Icons.Back, stringResource(R.string.cd_back), onBack) },
                 actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
             )
