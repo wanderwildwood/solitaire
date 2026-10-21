@@ -1,7 +1,8 @@
 # Solitaire
 
 Klondike, FreeCell and Spider for the [Mudita Kompakt](https://mudita.com/products/kompakt/),
-played by tapping, with nothing that moves on its own. It will install on any Android 12 device.
+played by tapping, with nothing that moves on its own. It will install on any
+device with Android 11 or later, Supernote's tablets among them.
 
 | | |
 |---|---|
