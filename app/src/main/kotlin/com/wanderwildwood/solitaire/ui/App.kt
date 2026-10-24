@@ -28,7 +28,6 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.solitaire.R
 import com.wanderwildwood.solitaire.Store
 import com.wanderwildwood.solitaire.game.Kind
-import com.wanderwildwood.solitaire.game.MoveTicks
 import com.wanderwildwood.solitaire.game.Pile
 import com.wanderwildwood.solitaire.game.Session
 import kotlin.random.Random
@@ -42,10 +41,6 @@ class Holder(private val store: Store, start: Session) : Table {
         private set
     private var _version by mutableIntStateOf(0)
     override val version: Int get() = _version
-    private val ticks = MoveTicks()
-    private var _moveTick by mutableIntStateOf(0)
-    override val moveTick: Int get() = _moveTick
-    override val buzz: Boolean get() = store.buzz
 
     private fun changed(wasWon: Boolean) {
         val s = session
@@ -58,19 +53,16 @@ class Holder(private val store: Store, start: Session) : Table {
         _version++
     }
 
-    /** Every accepted tap, deal, undo and finish comes through here, and nothing else does. */
     private fun act(f: (Session) -> Boolean) {
         val wasWon = session.won
-        if (ticks.after(f(session))) {
-            _moveTick = ticks.count
-            changed(wasWon)
-        }
+        if (f(session)) changed(wasWon)
     }
 
     override fun tap(pile: Pile, index: Int) = act { it.tap(pile, index) }
     override fun deal(): Boolean {
-        var moved = false
-        act { it.deal().also { m -> moved = m } }
+        val wasWon = session.won
+        val moved = session.deal()
+        if (moved) changed(wasWon)
         return moved
     }
     override fun forget() = session.forget()
@@ -186,7 +178,6 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
     var pickSuits by remember { mutableStateOf(false) }
     val draw = remember(v) { store.draw }
     val suits = remember(v) { store.suits }
-    val buzz = remember(v) { store.buzz }
     val drawNames = mapOf(1 to stringResource(R.string.settings_draw_1), 3 to stringResource(R.string.settings_draw_3))
     val suitNames = mapOf(
         1 to stringResource(R.string.settings_suits_1),
@@ -210,9 +201,6 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
             item(key = "suits") { SettingRow(stringResource(R.string.settings_suits), suitNames[suits]) { pickSuits = true } }
             item(key = "next") {
                 TextMMD(text = stringResource(R.string.settings_next_game), style = MaterialTheme.typography.labelSmall)
-            }
-            item(key = "buzz") {
-                SwitchRow(stringResource(R.string.settings_buzz), buzz, note = stringResource(R.string.settings_buzz_note)) { store.buzz = it; v++ }
             }
             item(key = "counts") { Heading(stringResource(R.string.settings_counts), Modifier.padding(top = 12.dp)) }
             for (kind in Kind.entries) {

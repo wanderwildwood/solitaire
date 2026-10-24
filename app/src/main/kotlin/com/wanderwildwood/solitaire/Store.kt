@@ -35,11 +35,6 @@ class Store(context: Context) {
         get() = prefs.getInt("suits", 1)
         set(v) { prefs.edit().putInt("suits", v).apply() }
 
-    /** A short tick when a card moves. Off until asked for. */
-    var buzz: Boolean
-        get() = prefs.getBoolean(BUZZ, BUZZ_DEFAULT)
-        set(v) { prefs.edit().putBoolean(BUZZ, v).apply() }
-
     fun played(kind: Kind) = prefs.getInt("played_${kind.name}", 0)
     fun won(kind: Kind) = prefs.getInt("won_${kind.name}", 0)
 
@@ -55,10 +50,5 @@ class Store(context: Context) {
         Kind.KLONDIKE -> draw
         Kind.SPIDER -> suits
         Kind.FREECELL -> 0
-    }
-
-    companion object {
-        const val BUZZ = "buzz"
-        const val BUZZ_DEFAULT = false
     }
 }

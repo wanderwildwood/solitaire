@@ -19,9 +19,6 @@ device with Android 11 or later, Supernote's tablets among them.
   run to move together.
 - **Tap the stock to deal.** In Klondike, tapping the empty stock turns the waste over.
 - **Undo** goes back one move at a time, all the way to the deal.
-- **A short tick when a card moves**, is turned, the stock is dealt or a move is undone, never for
-  a tap that goes nowhere. Off to begin with; the switch is in Settings and takes effect at once,
-  and the phone's own touch feedback setting still decides whether it is felt.
 - **Finish** appears once every card is face up and the stock is used up, and only when the
   game can really be played out from there. One tap puts every card home.
 - **New game** asks for a second tap while a game is under way, and forgets itself after four

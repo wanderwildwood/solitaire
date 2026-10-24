@@ -88,8 +88,6 @@
     <string name="settings_suits_2">Two suits</string>
     <string name="settings_suits_4">Four suits</string>
     <string name="settings_next_game">A change takes effect from the next new game.</string>
-    <string name="settings_buzz">Vibrate when a card moves</string>
-    <string name="settings_buzz_note">A short tick when a card moves, a card is turned, the stock is dealt or a move is undone. It starts at once, and stays quiet if the phone\'s own touch feedback is off.</string>
     <string name="settings_counts">Played and won</string>
     <!-- %1$s is the game's name, %2$s games played, %3$s games won -->
     <string name="settings_count_row">%1$s: played %2$s, won %3$s</string>
