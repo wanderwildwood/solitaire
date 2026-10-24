@@ -26,6 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import android.view.HapticFeedbackConstants
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.res.pluralStringResource
@@ -53,6 +56,10 @@ interface Table {
     val session: Session
     /** Bumped on every change, so the screen redraws. */
     val version: Int
+    /** Counts the turns accepted so far (a tap that moved, a deal, an undo, a finish); a new game does not count. */
+    val moveTick: Int
+    /** Whether Settings asks for a tick at each of them. */
+    val buzz: Boolean
     fun tap(pile: Pile, index: Int)
     fun deal(): Boolean
     fun forget()
@@ -78,6 +85,14 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
     BackHandler { onBack() }
     @Suppress("UNUSED_VARIABLE") val v = table.version
     val s = table.session
+    val view = LocalView.current
+    var ticked by remember { mutableIntStateOf(table.moveTick) }
+    LaunchedEffect(table.moveTick) {
+        if (table.moveTick == ticked) return@LaunchedEffect
+        ticked = table.moveTick
+        // The phone's keyboard tap, through the view: its own touch feedback setting still decides.
+        if (table.buzz) view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+    }
     var message by remember { mutableStateOf<String?>(null) }
     var askDeal by remember { mutableStateOf(false) }
     val title = if (s.kind == Kind.FREECELL) stringResource(R.string.freecell_deal, s.seed.toString()) else gameName(s.kind)

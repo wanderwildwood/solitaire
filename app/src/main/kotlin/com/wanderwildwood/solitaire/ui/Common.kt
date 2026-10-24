@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.radio_button.RadioButtonMMD
+import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 
 /** An icon in a top bar, with a target a thumb can find. */
@@ -50,6 +51,24 @@ fun SettingRow(title: String, value: String?, onClick: (() -> Unit)?) {
     ) {
         TextMMD(text = title, style = MaterialTheme.typography.bodyMedium)
         if (value != null) TextMMD(text = value, style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+@Composable
+fun SwitchRow(title: String, checked: Boolean, note: String? = null, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onChange(!checked) }
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            TextMMD(text = title, style = MaterialTheme.typography.bodyMedium)
+            if (note != null) TextMMD(text = note, style = MaterialTheme.typography.labelSmall)
+        }
+        Spacer(Modifier.width(12.dp))
+        SwitchMMD(checked = checked, onCheckedChange = null)
     }
 }
 
