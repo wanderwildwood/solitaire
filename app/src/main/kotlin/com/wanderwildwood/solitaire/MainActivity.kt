@@ -3,6 +3,8 @@ package com.wanderwildwood.solitaire
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -21,10 +23,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val store = Store(this)
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
-                // A debug build names each card's place for the emulator tests; a release names none.
-                Box(Modifier.semantics { testTagsAsResourceId = BuildConfig.DEBUG }) {
-                    SolitaireApp(store, if (savedInstanceState == null) debugStart() else null)
+            // A steady cursor: a blinking one is a repaint twice a second on an e-ink panel
+            // for as long as a field has focus.
+            CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
+                ThemeMMD(colorScheme = monochrome) {
+                    // A debug build names each card's place for the emulator tests; a release names none.
+                    Box(Modifier.semantics { testTagsAsResourceId = BuildConfig.DEBUG }) {
+                        SolitaireApp(store, if (savedInstanceState == null) debugStart() else null)
+                    }
                 }
             }
         }
