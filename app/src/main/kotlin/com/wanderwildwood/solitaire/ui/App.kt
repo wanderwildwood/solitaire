@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -162,7 +161,6 @@ private fun HomeScreen(store: Store, onPick: (Kind) -> Unit, onSettings: () -> U
                             )
                         }
                     }
-                    HorizontalDividerMMD(thickness = 1.dp)
                 }
             }
         }

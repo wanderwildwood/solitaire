@@ -151,7 +151,7 @@ private fun Controls(table: Table, version: Int, onDeal: () -> Unit, clear: () -
     var armed by remember { mutableStateOf(false) }
     LaunchedEffect(armed) {
         if (!armed) return@LaunchedEffect
-        delay(4000)
+        delay(ARM_MS)
         armed = false
     }
     val canFinish = remember(version) { !s.won && s.finishing() != null }
