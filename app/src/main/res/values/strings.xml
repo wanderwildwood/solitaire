@@ -99,27 +99,21 @@
     <string name="about_what">Klondike, FreeCell and Spider. FreeCell deals use the classic numbering, 1 to 32000.</string>
     <string name="about_feed_the_llamas">feed the llamas</string>
     <string name="about_close">Close</string>
-    <!-- The folio at the foot of a paged list, "2 / 6"; a tap on it asks for a page -->
-    <string name="folio_of">%1$d / %2$d</string>
-    <string name="folio_go_title">Go to page</string>
-    <string name="folio_page">Page %1$d of %2$d</string>
-    <string name="folio_go">Go</string>
-    <string name="folio_cancel">Cancel</string>
     <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_licence_head">Licence</string>
-    <string name="licences_licence">Solitaire is free software under the GNU General Public License, version 3 only (GPL-3.0-only), copyright wander wildwood, for what is written here. The work it is built on keeps its own licence and its authors keep their copyright, as listed under Built with. The full text of each licence is at the end of this page.</string>
+    <string name="licences_licence">Solitaire is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licences, listed below.</string>
     <string name="licences_built_head">Built with</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
-    <string name="licences_gpl">GNU General Public License, version 3</string>
-    <string name="licences_apache">Apache License, version 2.0</string>
-    <string name="licences_mit">MIT License</string>
-    <string name="licences_ofl">SIL Open Font License, version 1.1</string>
     <string name="about_what_head">Solitaire</string>
     <string name="about_privacy_head">Privacy</string>
     <string name="about_privacy">This app collects nothing and sends nothing anywhere. It asks for no permissions and has no internet permission. It keeps your games under way, the two settings and your counts of games played and won in its own private storage on the phone; uninstalling it removes them. There are no ads, no analytics and no tracking, and the app is not included in phone backups.</string>
     <string name="about_terms_head">Terms</string>
     <string name="about_terms">This app is free software under the GNU General Public License v3. It comes with no warranty, to the extent the law allows. It is a game: play it for fun.</string>
+    <string name="licences_full_head">Full texts</string>
+    <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
+    <string name="licences_full_apache">Apache License 2.0 (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
 </resources>
