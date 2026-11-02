@@ -97,9 +97,8 @@
 
     <string name="about_title">Solitaire %1$s</string>
     <string name="about_what">Klondike, FreeCell and Spider. FreeCell deals use the classic numbering, 1 to 32000.</string>
-    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_feed_the_llamas">Feed the llamas</string>
     <string name="about_close">Close</string>
-    <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no licence text here.</string>
