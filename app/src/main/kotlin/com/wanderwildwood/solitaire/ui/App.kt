@@ -105,7 +105,7 @@ fun SolitaireApp(store: Store, debugStart: Session?) {
     var screen by remember {
         mutableStateOf<Screen>(
             when {
-                debugStart != null -> Screen.Game(Holder(store, debugStart.also(store::save)))
+                debugStart != null -> Screen.Game(Holder(store, debugStart.also { store.save(it); store.open = it.kind }))
                 else -> store.open?.let { Screen.Game(Holder(store, Holder.resume(store, it))) } ?: Screen.Home
             },
         )
@@ -116,7 +116,6 @@ fun SolitaireApp(store: Store, debugStart: Session?) {
         store.open = (to as? Screen.Game)?.holder?.session?.kind
         screen = to
     }
-    if (debugStart != null) remember { store.open = debugStart.kind }
 
     when (val s = screen) {
         Screen.Home -> HomeScreen(
