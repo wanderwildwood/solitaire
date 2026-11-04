@@ -105,4 +105,3 @@ fun DialogButton(text: String, filled: Boolean = false, onClick: () -> Unit) {
         OutlinedButtonMMD(onClick = onClick, modifier = modifier) { TextMMD(text = text, style = MaterialTheme.typography.bodyMedium) }
     }
 }
-const val ARM_MS = 6000L

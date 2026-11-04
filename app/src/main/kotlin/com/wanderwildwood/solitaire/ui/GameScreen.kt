@@ -18,7 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +45,6 @@ import com.wanderwildwood.solitaire.game.Kind
 import com.wanderwildwood.solitaire.game.Pile
 import com.wanderwildwood.solitaire.game.Session
 import com.wanderwildwood.solitaire.game.Suit
-import kotlinx.coroutines.delay
 
 /** What the game screen asks of whoever holds the game. */
 interface Table {
@@ -148,12 +146,8 @@ private fun Controls(table: Table, version: Int, onDeal: () -> Unit, clear: () -
     // read here, not just passed: Compose leaves an unread parameter out when it decides whether
     // to redraw, and Finish then never appeared mid-game.
     val s = table.session
-    var armed by remember { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (!armed) return@LaunchedEffect
-        delay(ARM_MS)
-        armed = false
-    }
+    // Armed until something else happens (a card played, Back, the screen off): no timer.
+    var armed by rememberArmedFlag()
     val canFinish = remember(version) { !s.won && s.finishing() != null }
 
     Row(
