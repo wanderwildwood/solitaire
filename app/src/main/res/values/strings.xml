@@ -102,10 +102,9 @@
     <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no license text here.</string>
-    <string name="licences_licence">Solitaire is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licenses, each on its own page.</string>
+    <string name="licences_licence">Solitaire is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licenses, listed below.</string>
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
-    <string name="about_what_head">Solitaire</string>
     <string name="about_privacy_head">Privacy</string>
     <string name="about_privacy">This app collects nothing and sends nothing anywhere. It asks for no permissions and has no internet permission. It keeps your games under way, the two settings and your counts of games played and won in its own private storage on the phone; uninstalling it removes them. There are no ads, no analytics and no tracking, and the app is not included in phone backups.</string>
     <string name="about_terms_head">Terms</string>
@@ -124,4 +123,9 @@
     <string name="privacy_rights_title">Your rights</string>
     <string name="privacy_rights">Under the GDPR you can ask to see the data held about you, to have it corrected or deleted, to limit or object to its use, to take a copy with you, to withdraw consent, and to complain to a data protection authority. Since the app keeps what it stores only on your phone, you can do most of this yourself: clear the app\'s data in Android\'s settings, or uninstall the app.</string>
     <!-- /shared-about -->
+    <string name="about_open_drawer">Open %1$s</string>
+    <string name="about_close_drawer">Close %1$s</string>
+    <string name="about_intro_head">What it does</string>
+    <string name="about_contact_head">Contact</string>
+    <string name="about_links_head">Links</string>
 </resources>
