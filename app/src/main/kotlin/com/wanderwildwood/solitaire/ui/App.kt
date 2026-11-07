@@ -142,7 +142,7 @@ private fun HomeScreen(store: Store, onPick: (Kind) -> Unit, onSettings: () -> U
             )
         },
     ) { padding ->
-        PagedColumn(Modifier.padding(padding).fillMaxSize()) {
+        PagedColumn(Modifier.padding(padding).fillMaxSize(), showCutRow = true) {
             for (kind in Kind.entries) {
                 item(key = kind.name) {
                     val saved = remember { store.game(kind) }
@@ -193,7 +193,7 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
             )
         },
     ) { padding ->
-        PagedColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
+        PagedColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp), showCutRow = true) {
             item { Spacer(Modifier.height(8.dp)) }
             item(key = "draw") { SettingRow(stringResource(R.string.settings_draw), drawNames[draw]) { pickDraw = true } }
             item(key = "suits") { SettingRow(stringResource(R.string.settings_suits), suitNames[suits]) { pickSuits = true } }
