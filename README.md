@@ -46,7 +46,7 @@ of each kind played and won. There is no timer and no score, only a count of mov
 ## On this screen
 
 Cards are white with a black edge. Hearts and diamonds are drawn in outline and spades and
-clubs filled, so the two colours read apart in greys. A fanned column shows only each card's
+clubs filled, so the two colors read apart in grays. A fanned column shows only each card's
 rank and suit; a long column closes up its face-down cards first and then its face-up ones,
 so it never runs off the bottom of the screen and nothing scrolls. There is no hint button.
 
@@ -75,7 +75,7 @@ For updates without doing this by hand, add this repository to
 
     https://github.com/wanderwildwood/solitaire
 
-## Licence
+## License
 
 GPL-3.0-only. See [LICENSE](LICENSE).
 
