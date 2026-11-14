@@ -285,7 +285,8 @@ private fun TableView(
     val stockName = stringResource(R.string.pile_stock)
     val emptyName = stringResource(R.string.pile_empty)
 
-    Box(Modifier.fillMaxSize()) {
+    // Dark mode leaves the table alone: the cards stay white with their own suits.
+    Box(Modifier.fillMaxSize().keepColors()) {
         // ---------------- the top row
         when (kind) {
             Kind.KLONDIKE -> {
