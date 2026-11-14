@@ -128,4 +128,6 @@
     <string name="about_intro_head">What it does</string>
     <string name="about_contact_head">Contact</string>
     <string name="about_links_head">Links</string>
+    <string name="settings_dark">Dark mode</string>
+    <string name="settings_dark_note">White on black, in this app. Home has one switch for every app.</string>
 </resources>
