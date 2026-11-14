@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.text.TextMMD
@@ -170,6 +171,7 @@ private fun HomeScreen(store: Store, onPick: (Kind) -> Unit, onSettings: () -> U
 @Composable
 private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit) {
     BackHandler { onBack() }
+    val context = LocalContext.current
     var v by remember { mutableIntStateOf(0) }
     var pickDraw by remember { mutableStateOf(false) }
     var pickSuits by remember { mutableStateOf(false) }
@@ -198,6 +200,12 @@ private fun SettingsScreen(store: Store, onBack: () -> Unit, onAbout: () -> Unit
             item(key = "suits") { SettingRow(stringResource(R.string.settings_suits), suitNames[suits]) { pickSuits = true } }
             item(key = "next") {
                 TextMMD(text = stringResource(R.string.settings_next_game), style = MaterialTheme.typography.labelSmall)
+            }
+            item(key = "dark") {
+                SettingRow(
+                    stringResource(R.string.settings_dark),
+                    stringResource(if (DarkMode.on) R.string.settings_dark_on else R.string.settings_dark_off),
+                ) { DarkMode.set(context, !DarkMode.on) }
             }
             item(key = "counts") { Heading(stringResource(R.string.settings_counts), Modifier.padding(top = 12.dp)) }
             for (kind in Kind.entries) {
