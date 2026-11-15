@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,13 +54,17 @@ fun SettingRow(title: String, value: String?, onClick: (() -> Unit)?) {
     }
 }
 
-/** One of a few choices, pressed in place: MMD's radio button, the row taking the press. */
+/**
+ * One of a few choices, pressed in place: MMD's radio button, the row taking the press. Never
+ * under 48 dp tall (63 px on the Kompakt), however short its one line of text is.
+ */
 @Composable
 fun ChoiceRow(title: String, chosen: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            .heightIn(min = 48.dp)
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

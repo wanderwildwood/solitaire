@@ -53,21 +53,18 @@ class Holder(private val store: Store, start: Session) : Table {
         _version++
     }
 
-    private fun act(f: (Session) -> Boolean) {
+    private fun act(f: (Session) -> Boolean): Boolean {
         val wasWon = session.won
-        if (f(session)) changed(wasWon)
-    }
-
-    override fun tap(pile: Pile, index: Int) = act { it.tap(pile, index) }
-    override fun deal(): Boolean {
-        val wasWon = session.won
-        val moved = session.deal()
+        val moved = f(session)
         if (moved) changed(wasWon)
         return moved
     }
+
+    override fun tap(pile: Pile, index: Int): Boolean = act { it.tap(pile, index) }
+    override fun deal(): Boolean = act { it.deal() }
     override fun forget() = session.forget()
-    override fun undo() = act { it.undo() }
-    override fun finish() = act { it.finish() }
+    override fun undo() { act { it.undo() } }
+    override fun finish() { act { it.finish() } }
 
     private fun replace(s: Session) {
         session = s

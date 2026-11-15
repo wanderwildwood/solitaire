@@ -51,7 +51,8 @@ interface Table {
     val session: Session
     /** Bumped on every change, so the screen redraws. */
     val version: Int
-    fun tap(pile: Pile, index: Int)
+    /** A tap on a card; false when nothing could move. */
+    fun tap(pile: Pile, index: Int): Boolean
     fun deal(): Boolean
     fun forget()
     fun undo()
@@ -77,6 +78,10 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
     @Suppress("UNUSED_VARIABLE") val v = table.version
     val s = table.session
     var message by remember { mutableStateOf<String?>(null) }
+    // The last press was on a card or pile with nowhere to go. Said where the move count is, so the
+    // table does not shift, and it stays until the next press: on this panel a tap that changes
+    // nothing otherwise looks like a tap that was missed.
+    var noMove by remember { mutableStateOf(false) }
     var askDeal by remember { mutableStateOf(false) }
     val title = if (s.kind == Kind.FREECELL) stringResource(R.string.freecell_deal, s.seed.toString()) else gameName(s.kind)
     val fill = stringResource(R.string.fill_columns_first)
@@ -89,8 +94,9 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
                 navigationIcon = { BarButton(Icons.Back, stringResource(R.string.cd_back), onBack) },
                 actions = {
                     TextMMD(
-                        text = pluralStringResource(R.plurals.moves, s.moves, s.moves.toString()),
+                        text = if (noMove) stringResource(R.string.no_move) else pluralStringResource(R.plurals.moves, s.moves, s.moves.toString()),
                         style = MaterialTheme.typography.labelSmall,
+                        fontWeight = if (noMove) FontWeight.Bold else null,
                         modifier = Modifier.padding(end = 16.dp).testTag("moves"),
                     )
                 },
@@ -102,7 +108,7 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
                 Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .tap { table.forget(); message = null },
+                    .tap { table.forget(); message = null; noMove = false },
             ) {
                 TableView(
                     board = s.board,
@@ -110,10 +116,13 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
                     option = s.option,
                     width = maxWidth,
                     height = maxHeight,
-                    onTap = { p, i -> message = null; table.tap(p, i) },
+                    onTap = { p, i -> message = null; noMove = !table.tap(p, i) && !s.won },
                     onStock = {
                         message = null
-                        if (!table.deal() && s.rules.stockBlocked(s.board)) message = fill
+                        val dealt = table.deal()
+                        val blocked = !dealt && s.rules.stockBlocked(s.board)
+                        if (blocked) message = fill
+                        noMove = !dealt && !blocked && !s.won
                     },
                 )
                 if (s.won) {
@@ -132,7 +141,7 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp).testTag("message"),
                 )
             }
-            Controls(table, table.version, onDeal = { askDeal = true }, clear = { message = null })
+            Controls(table, table.version, onDeal = { askDeal = true }, clear = { message = null; noMove = false })
         }
     }
 
@@ -241,6 +250,17 @@ private fun sizes(columns: Int, width: Dp, gap: Dp, rankSmall: TextStyle, rankLa
 }
 
 /**
+ * How much of a covered face-up card shows in FreeCell, in px. Every card there is face up and a
+ * card is pressed by the strip of it that shows, so the strip is as tall as the table allows, up to
+ * [most]: tall enough that a column of twelve (eleven strips and the last card whole) still fits in
+ * [avail] unsqueezed. It depends on the screen only, never on the game, so cards do not shift about
+ * as columns grow; a longer column closes up as before. Never under [least], the strip the other
+ * games use.
+ */
+fun freeCellStrip(avail: Float, cardH: Float, least: Float, most: Float): Float =
+    ((avail - cardH) / 11f).coerceIn(least, maxOf(least, most))
+
+/**
  * Where each card of a column sits, top down. A face-down card shows a sliver and a face-up
  * one its strip. When the column is too long for the space, the face-down part closes up
  * first and then the face-up part, so the last card is always in full and nothing runs off
@@ -278,10 +298,13 @@ private fun TableView(
 ) {
     val columns = board.columns.size
     val gap = if (kind == Kind.SPIDER) 2.dp else 4.dp
-    val s = sizes(columns, width, gap, MaterialTheme.typography.bodySmall, MaterialTheme.typography.bodyMedium)
-    fun colX(i: Int) = PAD.dp + (s.cardW + gap) * i
+    val base = sizes(columns, width, gap, MaterialTheme.typography.bodySmall, MaterialTheme.typography.bodyMedium)
     val topY = PAD.dp
-    val tableauY = topY + s.cardH + 10.dp
+    val tableauY = topY + base.cardH + 10.dp
+    val s = if (kind != Kind.FREECELL) base else base.copy(
+        strip = freeCellStrip((height - tableauY - PAD.dp).value, base.cardH.value, base.strip.value, 36f).dp,
+    )
+    fun colX(i: Int) = PAD.dp + (s.cardW + gap) * i
     val stockName = stringResource(R.string.pile_stock)
     val emptyName = stringResource(R.string.pile_empty)
 
@@ -290,7 +313,7 @@ private fun TableView(
         // ---------------- the top row
         when (kind) {
             Kind.KLONDIKE -> {
-                StockView(board.stock, colX(0), topY, s, stockName, emptyName, onStock)
+                StockView(board.stock, board.waste.isNotEmpty(), colX(0), topY, s, stockName, emptyName, stringResource(R.string.pile_redeal), onStock)
                 val shown = board.waste.takeLast(if (option == 3) 3 else 1)
                 shown.forEachIndexed { k, card ->
                     val top = k == shown.lastIndex
@@ -307,7 +330,7 @@ private fun TableView(
             Kind.FREECELL -> {
                 for (i in 0 until 4) {
                     val c = board.cells[i]
-                    if (c == null) SlotView(colX(i), topY, s, "f$i", emptyName, null, null)
+                    if (c == null) SlotView(colX(i), topY, s, "f$i", emptyName, null, onTap = null)
                     else CardView(c, colX(i), topY, s, "f${i}_0", whole = true) { onTap(Pile.Cell(i), 0) }
                 }
                 Homes(board, 4, ::colX, topY, s, emptyName, onTap)
@@ -341,14 +364,15 @@ private fun TableView(
             val avail = (height - tableauY - PAD.dp).toPx()
             board.columns.forEachIndexed { c, cards ->
                 if (cards.isEmpty()) {
-                    SlotView(colX(c), tableauY, s, "c$c", emptyName, null, null)
+                    SlotView(colX(c), tableauY, s, "c$c", emptyName, null, onTap = null)
                 } else {
                     val ys = fan(cards, avail, s.cardH.toPx(), s.back.toPx(), s.strip.toPx())
                     cards.forEachIndexed { i, card ->
                         CardView(
                             card, colX(c), tableauY + ys[i].toDp(), s, tag = "c${c}_$i",
                             whole = i == cards.lastIndex,
-                            onTap = if (card.up) ({ onTap(Pile.Column(c), i) }) else null,
+                            // A face-down card takes the press too: it cannot move, and says so.
+                            onTap = { onTap(Pile.Column(c), i) },
                         )
                     }
                 }
@@ -358,8 +382,9 @@ private fun TableView(
 }
 
 @Composable
-private fun StockView(stock: List<Card>, x: Dp, y: Dp, s: Sizes, name: String, emptyName: String, onStock: () -> Unit) {
-    if (stock.isEmpty()) SlotView(x, y, s, "stock", emptyName, null, onStock)
+private fun StockView(stock: List<Card>, canRedeal: Boolean, x: Dp, y: Dp, s: Sizes, name: String, emptyName: String, redealName: String, onStock: () -> Unit) {
+    // An empty stock with cards in the waste is pressed to turn them back over: the arrow says so.
+    if (stock.isEmpty()) SlotView(x, y, s, "stock", if (canRedeal) redealName else emptyName, null, redeal = canRedeal, onTap = onStock)
     else CardView(stock.last(), x, y, s, "stock", whole = false, onTap = onStock)
 }
 
@@ -368,7 +393,7 @@ private fun Homes(board: Board, first: Int, colX: (Int) -> Dp, y: Dp, s: Sizes, 
     for (i in 0 until 4) {
         val h = board.homes[i]
         if (h.isEmpty()) {
-            SlotView(colX(first + i), y, s, "h$i", emptyName, Suit.entries[i], null)
+            SlotView(colX(first + i), y, s, "h$i", emptyName, Suit.entries[i], onTap = null)
         } else {
             CardView(h.last(), colX(first + i), y, s, "h${i}_${h.lastIndex}", whole = true) { onTap(Pile.Home(i), h.lastIndex) }
         }

@@ -28,4 +28,29 @@ class FanTest {
         val ys = fan(column(5, 13), avail, 60f, 9f, 29f)
         assertEquals(3f, ys[1] - ys[0])
     }
+
+    @Test fun freeCellStripsAreAsTallAsTheTableAllows() {
+        // The Kompakt's table: about 390 dp under the top row, a card 63 dp tall.
+        val strip = freeCellStrip(avail = 390f, cardH = 63f, least = 22f, most = 36f)
+        assertEquals(327f / 11f, strip, 0.001f)
+        // A column of twelve then fits exactly, unsqueezed.
+        val ys = fan(column(0, 12), 390f, 63f, 7f, strip)
+        assertEquals(390f, ys.last() + 63f, 0.01f)
+        assertEquals(strip, ys[1] - ys[0], 0.001f)
+    }
+
+    @Test fun freeCellStripsStayBetweenTheUsualStripAndTheMost() {
+        // A short table: never under the strip the other games use.
+        assertEquals(22f, freeCellStrip(avail = 200f, cardH = 63f, least = 22f, most = 36f))
+        // A tall one: never over the most.
+        assertEquals(36f, freeCellStrip(avail = 900f, cardH = 63f, least = 22f, most = 36f))
+        // Limits the wrong way round do not throw.
+        assertEquals(40f, freeCellStrip(avail = 900f, cardH = 63f, least = 40f, most = 36f))
+    }
+
+    @Test fun aCardBacksLinesAreWholePixelsWithWhiteBetween() {
+        assertEquals(5, backPitchPx(5.25f))
+        assertEquals(4, backPitchPx(4f))
+        assertEquals(3, backPitchPx(1f))
+    }
 }

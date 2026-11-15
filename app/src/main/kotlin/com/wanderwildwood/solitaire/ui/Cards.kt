@@ -13,10 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -35,11 +39,50 @@ import com.wanderwildwood.solitaire.R
 import com.wanderwildwood.solitaire.game.Card
 import com.wanderwildwood.solitaire.game.Suit
 
-/** The grey of a card's back: one flat tone, which the panel draws as an even dither. */
-val CardBack = Color(0xFF9A9A9A)
+/**
+ * How far apart the lines of a card's back are, in px, for a wanted spacing of [wantPx]: whole
+ * pixels, and never under 3, so there is always white between two one-pixel lines.
+ */
+fun backPitchPx(wantPx: Float): Int = Math.round(wantPx).coerceAtLeast(3)
 
-/** The faint line of an empty place on the table. */
-val SlotLine = Color(0xFFAAAAAA)
+/**
+ * A card's back: white with a grid of black lines, every line on whole pixels. No grey anywhere,
+ * so the panel has nothing to dither (a flat grey back came out as a restless speckle). The
+ * first line across is one step under the top edge, so even the sliver of a covered card shows
+ * the grid and reads apart from a white face.
+ */
+private fun DrawScope.cardBack(radius: CornerRadius) {
+    drawRoundRect(Color.White, cornerRadius = radius)
+    val pitch = backPitchPx(4.dp.toPx())
+    val line = Math.round(1.dp.toPx()).coerceAtLeast(1).toFloat()
+    val shape = Path().apply { addRoundRect(RoundRect(0f, 0f, size.width, size.height, radius)) }
+    clipPath(shape) {
+        var x = pitch.toFloat()
+        while (x < size.width) { drawRect(Color.Black, Offset(x, 0f), Size(line, size.height)); x += pitch }
+        var y = pitch.toFloat()
+        while (y < size.height) { drawRect(Color.Black, Offset(0f, y), Size(size.width, line)); y += pitch }
+    }
+}
+
+/** The arrow going round in an empty stock that the waste can be turned back into. */
+private fun DrawScope.redealMark(center: Offset, radius: Float) {
+    val w = (radius * 0.24f).coerceAtLeast(1.5f)
+    drawArc(
+        Color.Black, startAngle = -50f, sweepAngle = 290f, useCenter = false,
+        topLeft = Offset(center.x - radius, center.y - radius), size = Size(radius * 2, radius * 2), style = Stroke(w),
+    )
+    // The head, at the open end of the arc (50 degrees above the x axis), pointing on round.
+    val a = Math.toRadians(-50.0)
+    val tip = Offset(center.x + radius * Math.cos(a).toFloat(), center.y + radius * Math.sin(a).toFloat())
+    val h = radius * 0.62f
+    val head = Path().apply {
+        moveTo(tip.x + h * 0.55f, tip.y + h * 0.55f)
+        lineTo(tip.x + h * 0.35f, tip.y - h * 0.75f)
+        lineTo(tip.x - h * 0.8f, tip.y + h * 0.1f)
+        close()
+    }
+    drawPath(head, Color.Black, style = Fill)
+}
 
 /** The sizes one game's table is drawn at, worked out from the width of the screen. */
 data class Sizes(
@@ -58,8 +101,8 @@ data class Sizes(
  * every size and on every phone. Hearts and diamonds are drawn in outline and spades and
  * clubs filled, so the two colours read apart on a screen with no red.
  */
-fun DrawScope.suit(suit: Suit, topLeft: Offset, size: Float, ink: Color = Color.Black) {
-    val p = Path()
+fun DrawScope.suit(suit: Suit, topLeft: Offset, size: Float, ink: Color = Color.Black, outlineOnly: Boolean = false) {
+    var p = Path()
     fun x(f: Float) = topLeft.x + f * size
     fun y(f: Float) = topLeft.y + f * size
     when (suit) {
@@ -91,17 +134,27 @@ fun DrawScope.suit(suit: Suit, topLeft: Offset, size: Float, ink: Color = Color.
         }
         Suit.CLUBS -> {
             val r = 0.2f * size
-            drawCircle(ink, r, Offset(x(0.5f), y(0.26f)))
-            drawCircle(ink, r, Offset(x(0.27f), y(0.58f)))
-            drawCircle(ink, r, Offset(x(0.73f), y(0.58f)))
-            drawCircle(ink, r * 0.6f, Offset(x(0.5f), y(0.52f)))
             p.moveTo(x(0.5f), y(0.5f))
             p.lineTo(x(0.64f), y(0.96f))
             p.lineTo(x(0.36f), y(0.96f))
             p.close()
+            if (outlineOnly) {
+                // One outline round the whole club: the three leaves, the middle and the stalk joined.
+                for ((c, rr) in listOf(Offset(x(0.5f), y(0.26f)) to r, Offset(x(0.27f), y(0.58f)) to r, Offset(x(0.73f), y(0.58f)) to r, Offset(x(0.5f), y(0.52f)) to r * 0.6f)) {
+                    val leaf = Path().apply { addOval(Rect(c.x - rr, c.y - rr, c.x + rr, c.y + rr)) }
+                    p = Path.combine(PathOperation.Union, p, leaf)
+                }
+            } else {
+                drawCircle(ink, r, Offset(x(0.5f), y(0.26f)))
+                drawCircle(ink, r, Offset(x(0.27f), y(0.58f)))
+                drawCircle(ink, r, Offset(x(0.73f), y(0.58f)))
+                drawCircle(ink, r * 0.6f, Offset(x(0.5f), y(0.52f)))
+            }
         }
     }
-    if (suit.red) {
+    if (outlineOnly) {
+        drawPath(p, ink, style = Stroke(width = (size * 0.06f).coerceAtLeast(1.5f)))
+    } else if (suit.red) {
         drawPath(p, ink, style = Stroke(width = (size * 0.11f).coerceAtLeast(1.5f)))
     } else {
         drawPath(p, ink, style = Fill)
@@ -168,7 +221,7 @@ fun CardView(card: Card, x: Dp, y: Dp, s: Sizes, tag: String, whole: Boolean, pi
         Canvas(Modifier.size(s.cardW, s.cardH)) {
             val r = CornerRadius(4.dp.toPx())
             val line = 1.dp.toPx()
-            drawRoundRect(if (card.up) Color.White else CardBack, cornerRadius = r)
+            if (card.up) drawRoundRect(Color.White, cornerRadius = r) else cardBack(r)
             drawRoundRect(Color.Black, cornerRadius = r, style = Stroke(line), topLeft = Offset(line / 2, line / 2),
                 size = Size(size.width - line, size.height - line))
             if (!card.up) return@Canvas
@@ -197,9 +250,13 @@ fun CardView(card: Card, x: Dp, y: Dp, s: Sizes, tag: String, whole: Boolean, pi
     }
 }
 
-/** An empty place: a faint outline, and the suit that belongs there if it is a foundation. */
+/**
+ * An empty place: a dashed outline, and the suit that belongs there if it is a foundation, drawn
+ * in outline whatever its colour so that it is not taken for a card. All of it black: a grey line
+ * is dithered by the panel. [redeal] puts the turning arrow in an empty stock that can be dealt again.
+ */
 @Composable
-fun SlotView(x: Dp, y: Dp, s: Sizes, tag: String, name: String, suitMark: Suit?, onTap: (() -> Unit)?) {
+fun SlotView(x: Dp, y: Dp, s: Sizes, tag: String, name: String, suitMark: Suit?, redeal: Boolean = false, onTap: (() -> Unit)?) {
     Box(
         Modifier
             .offset(x, y)
@@ -213,13 +270,14 @@ fun SlotView(x: Dp, y: Dp, s: Sizes, tag: String, name: String, suitMark: Suit?,
         Canvas(Modifier.size(s.cardW, s.cardH)) {
             val line = 1.dp.toPx()
             drawRoundRect(
-                SlotLine, cornerRadius = CornerRadius(4.dp.toPx()), style = Stroke(line, pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 3.dp.toPx()))),
+                Color.Black, cornerRadius = CornerRadius(4.dp.toPx()), style = Stroke(line, pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 3.dp.toPx()))),
                 topLeft = Offset(line / 2, line / 2), size = Size(size.width - line, size.height - line),
             )
             if (suitMark != null) {
                 val big = size.width * 0.45f
-                suit(suitMark, Offset((size.width - big) / 2, (size.height - big) / 2), big, SlotLine)
+                suit(suitMark, Offset((size.width - big) / 2, (size.height - big) / 2), big, outlineOnly = true)
             }
+            if (redeal) redealMark(Offset(size.width / 2, size.height / 2), size.width * 0.2f)
         }
     }
 }
