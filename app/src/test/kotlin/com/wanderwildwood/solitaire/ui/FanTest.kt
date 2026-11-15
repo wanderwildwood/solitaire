@@ -29,23 +29,33 @@ class FanTest {
         assertEquals(3f, ys[1] - ys[0])
     }
 
-    @Test fun freeCellStripsAreAsTallAsTheTableAllows() {
+    @Test fun aShortFreeCellColumnSpreadsDownTheRoomItHas() {
         // The Kompakt's table: about 390 dp under the top row, a card 63 dp tall.
-        val strip = freeCellStrip(avail = 390f, cardH = 63f, least = 22f, most = 36f)
-        assertEquals(327f / 11f, strip, 0.001f)
-        // A column of twelve then fits exactly, unsqueezed.
-        val ys = fan(column(0, 12), 390f, 63f, 7f, strip)
+        // Seven cards as dealt: six strips share 327, most of a card each.
+        val most = 63f * FREECELL_MOST_STRIP
+        val seven = freeCellStrip(avail = 390f, cardH = 63f, least = 22f, most = most, cards = 7)
+        assertEquals(327f / 6f, seven, 0.001f)
+        // Three cards: capped at most of a card, so they still read as a stack.
+        assertEquals(most, freeCellStrip(avail = 390f, cardH = 63f, least = 22f, most = most, cards = 3), 0.001f)
+        // Ten cards: nine strips share the room and the last card ends at the foot.
+        val ten = freeCellStrip(avail = 390f, cardH = 63f, least = 22f, most = most, cards = 10)
+        assertEquals(327f / 9f, ten, 0.001f)
+        val ys = fan(column(0, 10), 390f, 63f, 7f, ten)
         assertEquals(390f, ys.last() + 63f, 0.01f)
-        assertEquals(strip, ys[1] - ys[0], 0.001f)
+        assertEquals(ten, ys[1] - ys[0], 0.001f)
+        // A shorter column never shows less of each card than a longer one.
+        val strips = (2..20).map { freeCellStrip(390f, 63f, 22f, most, it) }
+        assertTrue(strips.zipWithNext().all { (a, b) -> a >= b })
     }
 
     @Test fun freeCellStripsStayBetweenTheUsualStripAndTheMost() {
-        // A short table: never under the strip the other games use.
-        assertEquals(22f, freeCellStrip(avail = 200f, cardH = 63f, least = 22f, most = 36f))
-        // A tall one: never over the most.
-        assertEquals(36f, freeCellStrip(avail = 900f, cardH = 63f, least = 22f, most = 36f))
-        // Limits the wrong way round do not throw.
-        assertEquals(40f, freeCellStrip(avail = 900f, cardH = 63f, least = 40f, most = 36f))
+        // A long column on a short table: never under the strip the other games use.
+        assertEquals(22f, freeCellStrip(avail = 200f, cardH = 63f, least = 22f, most = 56f, cards = 12))
+        // A short one on a tall table: never over the most.
+        assertEquals(56f, freeCellStrip(avail = 900f, cardH = 63f, least = 22f, most = 56f, cards = 3))
+        // One card alone, and limits the wrong way round, do not throw.
+        assertEquals(56f, freeCellStrip(avail = 900f, cardH = 63f, least = 22f, most = 56f, cards = 1))
+        assertEquals(40f, freeCellStrip(avail = 900f, cardH = 63f, least = 40f, most = 36f, cards = 5))
     }
 
     @Test fun aCardBacksLinesAreWholePixelsWithWhiteBetween() {

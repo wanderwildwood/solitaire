@@ -117,21 +117,23 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
                     .fillMaxWidth()
                     .tap { table.forget(); message = null; noMove = false },
             ) {
-                TableView(
-                    board = s.board,
-                    kind = s.kind,
-                    option = s.option,
-                    width = maxWidth,
-                    height = maxHeight,
-                    onTap = { p, i -> message = null; noMove = !table.tap(p, i) && !s.won },
-                    onStock = {
-                        message = null
-                        val dealt = table.deal()
-                        val blocked = !dealt && s.rules.stockBlocked(s.board)
-                        if (blocked) message = fill
-                        noMove = !dealt && !blocked && !s.won
-                    },
-                )
+                ExactTouch {
+                    TableView(
+                        board = s.board,
+                        kind = s.kind,
+                        option = s.option,
+                        width = maxWidth,
+                        height = maxHeight,
+                        onTap = { p, i -> message = null; noMove = !table.tap(p, i) && !s.won },
+                        onStock = {
+                            message = null
+                            val dealt = table.deal()
+                            val blocked = !dealt && s.rules.stockBlocked(s.board)
+                            if (blocked) message = fill
+                            noMove = !dealt && !blocked && !s.won
+                        },
+                    )
+                }
                 if (s.won) {
                     TextMMD(
                         text = stringResource(R.string.won_in, pluralStringResource(R.plurals.moves, s.moves, s.moves.toString())),
@@ -270,15 +272,17 @@ private fun sizes(columns: Int, width: Dp, gap: Dp, rankSmall: TextStyle, rankLa
 }
 
 /**
- * How much of a covered face-up card shows in FreeCell, in px. Every card there is face up and a
- * card is pressed by the strip of it that shows, so the strip is as tall as the table allows, up to
- * [most]: tall enough that a column of twelve (eleven strips and the last card whole) still fits in
- * [avail] unsqueezed. It depends on the screen only, never on the game, so cards do not shift about
- * as columns grow; a longer column closes up as before. Never under [least], the strip the other
- * games use.
+ * How much of a covered face-up card shows in a FreeCell column of [cards], in px. Every card there
+ * is face up and a card is pressed by the strip of it that shows, so each column spreads down the
+ * room it has: a short column shows tall strips, up to [most], and a long one closes up until its
+ * last card ends at the foot of [avail]. Never under [least], the strip the other games use; past
+ * that, [fan] squeezes the column as in the other games.
  */
-fun freeCellStrip(avail: Float, cardH: Float, least: Float, most: Float): Float =
-    ((avail - cardH) / 11f).coerceIn(least, maxOf(least, most))
+fun freeCellStrip(avail: Float, cardH: Float, least: Float, most: Float, cards: Int): Float =
+    ((avail - cardH) / (cards - 1).coerceAtLeast(1)).coerceIn(least, maxOf(least, most))
+
+/** The most of a covered FreeCell card that shows: its corner and most of its face, still a stack. */
+const val FREECELL_MOST_STRIP = 0.9f
 
 /**
  * Where each card of a column sits, top down. A face-down card shows a sliver and a face-up
@@ -318,12 +322,9 @@ private fun TableView(
 ) {
     val columns = board.columns.size
     val gap = if (kind == Kind.SPIDER) 2.dp else 4.dp
-    val base = sizes(columns, width, gap, MaterialTheme.typography.bodySmall, MaterialTheme.typography.bodyMedium)
+    val s = sizes(columns, width, gap, MaterialTheme.typography.bodySmall, MaterialTheme.typography.bodyMedium)
     val topY = PAD.dp
-    val tableauY = topY + base.cardH + 10.dp
-    val s = if (kind != Kind.FREECELL) base else base.copy(
-        strip = freeCellStrip((height - tableauY - PAD.dp).value, base.cardH.value, base.strip.value, 36f).dp,
-    )
+    val tableauY = topY + s.cardH + 10.dp
     fun colX(i: Int) = PAD.dp + (s.cardW + gap) * i
     val stockName = stringResource(R.string.pile_stock)
     val emptyName = stringResource(R.string.pile_empty)
@@ -386,7 +387,10 @@ private fun TableView(
                 if (cards.isEmpty()) {
                     SlotView(colX(c), tableauY, s, "c$c", emptyName, null, onTap = null)
                 } else {
-                    val ys = fan(cards, avail, s.cardH.toPx(), s.back.toPx(), s.strip.toPx())
+                    // FreeCell spreads each column down the room it has, so short columns show tall strips.
+                    val strip = if (kind != Kind.FREECELL) s.strip.toPx()
+                    else freeCellStrip(avail, s.cardH.toPx(), s.strip.toPx(), s.cardH.toPx() * FREECELL_MOST_STRIP, cards.size)
+                    val ys = fan(cards, avail, s.cardH.toPx(), s.back.toPx(), strip)
                     cards.forEachIndexed { i, card ->
                         CardView(
                             card, colX(c), tableauY + ys[i].toDp(), s, tag = "c${c}_$i",

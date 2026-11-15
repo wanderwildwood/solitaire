@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,8 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -31,6 +34,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -199,6 +203,23 @@ fun Modifier.tap(onTap: (() -> Unit)?): Modifier =
         indication = null,
         onClick = onTap,
     )
+
+/**
+ * Cards and places press exactly where they are drawn. Compose otherwise stretches the press of
+ * anything narrower than 48 dp out to 48 dp, and Spider's ten columns are narrower than that, so a
+ * card's press reached over the gap into the next column. On the table every place is drawn as big
+ * as the width allows, and a press lands on the card under the finger.
+ */
+@Composable
+fun ExactTouch(content: @Composable () -> Unit) {
+    val base = LocalViewConfiguration.current
+    val exact = remember(base) {
+        object : ViewConfiguration by base {
+            override val minimumTouchTargetSize: DpSize get() = DpSize.Zero
+        }
+    }
+    CompositionLocalProvider(LocalViewConfiguration provides exact, content = content)
+}
 
 /**
  * One card at [x], [y]. A face-up card shows its rank and suit across the top, which is all
