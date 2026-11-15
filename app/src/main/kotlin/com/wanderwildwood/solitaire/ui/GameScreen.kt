@@ -285,6 +285,18 @@ fun freeCellStrip(avail: Float, cardH: Float, least: Float, most: Float, cards: 
 const val FREECELL_MOST_STRIP = 0.9f
 
 /**
+ * How much of a covered face-up card shows in a Spider column, in px. Spider's ten columns make
+ * narrow cards, so the strip that shows is what a finger presses; like FreeCell, each column spreads
+ * its face-up run down the room left once its face-down cards have their slivers ([back] each), up
+ * to [most], and never under [least], the usual strip, past which [fan] squeezes as before.
+ */
+fun spiderStrip(cards: List<Card>, avail: Float, cardH: Float, back: Float, least: Float, most: Float): Float {
+    val downs = cards.dropLast(1).count { !it.up }
+    val ups = cards.size - 1 - downs
+    return ((avail - cardH - downs * back) / ups.coerceAtLeast(1)).coerceIn(least, maxOf(least, most))
+}
+
+/**
  * Where each card of a column sits, top down. A face-down card shows a sliver and a face-up
  * one its strip. When the column is too long for the space, the face-down part closes up
  * first and then the face-up part, so the last card is always in full and nothing runs off
@@ -388,9 +400,14 @@ private fun TableView(
                 if (cards.isEmpty()) {
                     SlotView(colX(c), tableauY, s, "c$c", emptyName, null, onTap = null)
                 } else {
-                    // FreeCell spreads each column down the room it has, so short columns show tall strips.
-                    val strip = if (kind != Kind.FREECELL) s.strip.toPx()
-                    else freeCellStrip(avail, s.cardH.toPx(), s.strip.toPx(), s.cardH.toPx() * FREECELL_MOST_STRIP, cards.size)
+                    // FreeCell and Spider spread each column down the room it has, so short columns
+                    // show tall strips; Spider keeps its face-down slivers as they are.
+                    val most = s.cardH.toPx() * FREECELL_MOST_STRIP
+                    val strip = when (kind) {
+                        Kind.FREECELL -> freeCellStrip(avail, s.cardH.toPx(), s.strip.toPx(), most, cards.size)
+                        Kind.SPIDER -> spiderStrip(cards, avail, s.cardH.toPx(), s.back.toPx(), s.strip.toPx(), most)
+                        else -> s.strip.toPx()
+                    }
                     val ys = fan(cards, avail, s.cardH.toPx(), s.back.toPx(), strip)
                     cards.forEachIndexed { i, card ->
                         CardView(

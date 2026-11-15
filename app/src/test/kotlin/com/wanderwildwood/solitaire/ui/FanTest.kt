@@ -48,6 +48,29 @@ class FanTest {
         assertTrue(strips.zipWithNext().all { (a, b) -> a >= b })
     }
 
+    @Test fun aSpiderColumnSpreadsItsFaceUpRunAndKeepsItsSlivers() {
+        // A Kompakt-like Spider table: about 420 px under the top row, a card 63 px tall, slivers of 10.
+        val most = 63f * FREECELL_MOST_STRIP
+        // Five face down, three face up: two strips share what the slivers leave, capped at most.
+        val dealt = column(5, 3)
+        val strip = spiderStrip(dealt, avail = 420f, cardH = 63f, back = 10f, least = 30f, most = most)
+        assertEquals(most, strip, 0.001f)
+        // Five face down, eight face up: seven strips share 420 - 63 - 50, well over the usual 30.
+        val run = column(5, 8)
+        val spread = spiderStrip(run, avail = 420f, cardH = 63f, back = 10f, least = 30f, most = most)
+        assertEquals(307f / 7f, spread, 0.001f)
+        assertTrue(spread >= 43f)
+        val ys = fan(run, 420f, 63f, 10f, spread)
+        assertEquals(10f, ys[1] - ys[0], 0.001f)   // slivers unchanged
+        assertEquals(spread, ys[6] - ys[5], 0.001f)
+        assertEquals(420f, ys.last() + 63f, 0.01f)  // the last card ends at the foot
+        // A long run on a short table never goes under the usual strip.
+        assertEquals(30f, spiderStrip(column(4, 13), 300f, 63f, 10f, 30f, most), 0.001f)
+        // One card, or only face-down cards above the top card, does not throw.
+        assertEquals(most, spiderStrip(column(0, 1), 420f, 63f, 10f, 30f, most), 0.001f)
+        assertEquals(most, spiderStrip(column(5, 1), 420f, 63f, 10f, 30f, most), 0.001f)
+    }
+
     @Test fun freeCellStripsStayBetweenTheUsualStripAndTheMost() {
         // A long column on a short table: never under the strip the other games use.
         assertEquals(22f, freeCellStrip(avail = 200f, cardH = 63f, least = 22f, most = 56f, cards = 12))
