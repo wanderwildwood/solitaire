@@ -23,6 +23,10 @@ import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.radio_button.RadioButtonMMD
 import com.mudita.mmd.components.text.TextMMD
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 
 /** An icon in a top bar, with a target a thumb can find. */
 @Composable
@@ -63,6 +67,7 @@ fun ChoiceRow(title: String, chosen: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics { role = Role.RadioButton; selected = chosen }
             .clickable(onClick = onClick)
             .heightIn(min = 48.dp)
             .padding(vertical = 4.dp),
