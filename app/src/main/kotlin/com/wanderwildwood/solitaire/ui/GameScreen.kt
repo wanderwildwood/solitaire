@@ -329,8 +329,9 @@ private fun TableView(
     val stockName = stringResource(R.string.pile_stock)
     val emptyName = stringResource(R.string.pile_empty)
 
-    // Dark mode leaves the table alone: the cards stay white with their own suits.
-    Box(Modifier.fillMaxSize().keepColors()) {
+    // Dark mode leaves the cards alone (CardView keeps their colors); the empty places and the
+    // words on the table turn with the page, so they show on the dark table too.
+    Box(Modifier.fillMaxSize()) {
         // ---------------- the top row
         when (kind) {
             Kind.KLONDIKE -> {

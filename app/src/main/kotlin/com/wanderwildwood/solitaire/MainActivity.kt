@@ -16,6 +16,7 @@ import com.wanderwildwood.solitaire.ui.ArmedScope
 import com.wanderwildwood.solitaire.ui.SolitaireApp
 import com.wanderwildwood.solitaire.ui.houseTypography
 import com.wanderwildwood.solitaire.ui.monochrome
+import com.wanderwildwood.solitaire.ui.DarkSelection
 
 class MainActivity : ComponentActivity() {
 
@@ -27,13 +28,13 @@ class MainActivity : ComponentActivity() {
             // A steady cursor: a blinking one is a repaint twice a second on an e-ink panel
             // for as long as a field has focus.
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-                ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+                ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                     // A debug build names each card's place for the emulator tests; a release names none.
                     // ArmedScope: an armed "tap again" row stays armed until the next other touch.
                     ArmedScope(Modifier.semantics { testTagsAsResourceId = BuildConfig.DEBUG }) {
                         SolitaireApp(store, if (savedInstanceState == null) debugStart() else null)
                     }
-                }
+                } }
             }
         }
     }

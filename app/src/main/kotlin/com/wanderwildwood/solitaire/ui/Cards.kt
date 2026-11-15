@@ -234,6 +234,8 @@ fun CardView(card: Card, x: Dp, y: Dp, s: Sizes, tag: String, whole: Boolean, pi
             .offset(x, y)
             .size(s.cardW, s.cardH)
             .testTag(tag)
+            // Dark mode leaves a card alone: white, with its own suits.
+            .keepColors()
             // The press and the words on one node, so a screen reader says the card's name
             // where the press is, rather than the corner's "7" on its own.
             .tap(onTap)
