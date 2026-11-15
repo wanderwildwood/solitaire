@@ -45,6 +45,13 @@ import com.wanderwildwood.solitaire.game.Kind
 import com.wanderwildwood.solitaire.game.Pile
 import com.wanderwildwood.solitaire.game.Session
 import com.wanderwildwood.solitaire.game.Suit
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 
 /** What the game screen asks of whoever holds the game. */
 interface Table {
@@ -208,7 +215,21 @@ private fun Controls(table: Table, version: Int, onDeal: () -> Unit, clear: () -
 private fun DealDialog(onDeal: (Int) -> Unit, onDismiss: () -> Unit) {
     var text by remember { mutableStateOf("") }
     var wrong by remember { mutableStateOf(false) }
+    val deal = {
+        val n = text.toIntOrNull()
+        if (n == null || n !in 1..32000) wrong = true else onDeal(n)
+    }
+    val field = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
     EInkDialog(onDismiss = onDismiss) {
+        // The number is what the dialog is for: the field takes the focus as it opens and the
+        // keyboard comes up. Asked from inside the dialog, a frame after it is drawn: the field
+        // lives in the dialog's own window, which a request from the screen beneath does not reach.
+        LaunchedEffect(Unit) {
+            withFrameNanos { }
+            runCatching { field.requestFocus() }
+            keyboard?.show()
+        }
         TextMMD(text = stringResource(R.string.deal_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
         Spacer(Modifier.height(8.dp))
         TextFieldMMD(
@@ -216,17 +237,16 @@ private fun DealDialog(onDeal: (Int) -> Unit, onDismiss: () -> Unit) {
             onValueChange = { v -> text = v.filter { it.isDigit() }.take(5); wrong = false },
             singleLine = true,
             placeholder = { TextMMD(text = stringResource(R.string.deal_hint), style = MaterialTheme.typography.labelSmall) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth().testTag("dealfield"),
+            // Done on the keyboard is Deal.
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { deal() }),
+            modifier = Modifier.fillMaxWidth().focusRequester(field).testTag("dealfield"),
         )
         if (wrong) {
             TextMMD(text = stringResource(R.string.deal_out_of_range), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 6.dp))
         }
         Spacer(Modifier.height(12.dp))
-        DialogButton(stringResource(R.string.deal_go), filled = true) {
-            val n = text.toIntOrNull()
-            if (n == null || n !in 1..32000) wrong = true else onDeal(n)
-        }
+        DialogButton(stringResource(R.string.deal_go), filled = true) { deal() }
         DialogButton(stringResource(R.string.cancel), onClick = onDismiss)
     }
 }
