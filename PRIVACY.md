@@ -4,13 +4,17 @@ Solitaire collects nothing and sends nothing anywhere. It asks for no permission
 internet permission, so it cannot.
 
 It keeps, in its own private storage on the phone: the game of each kind you have under way
-(the deal and the moves made since), which game was open, the two settings, and how many games
+(the deal and the moves made since), which game was open, the settings, and how many games
 of each kind you have played and won. None of it is backed up by the app, and uninstalling it
 removes all of it.
 
-The About dialog's last line opens a web address in your browser, and its "Write to
+The About dialog's links open a web address in your browser, and its "Write to
 email@wanderthe.dev" row opens your email app, each only when you press it. The app talks to no
 outside service.
+
+One of those links, "Feed the llamas", opens a donation page (square.link). Giving is voluntary
+and unlocks nothing. The app sends nothing to that page; if you give, the payment and its details
+are handled there by Square, under Square's own privacy policy, and never pass through the app.
 
 The one permission in its manifest is not one you are asked for: Android's support library adds
 it to every app built with it (`DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`), so that the app's own
