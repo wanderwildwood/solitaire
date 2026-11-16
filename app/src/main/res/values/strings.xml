@@ -132,7 +132,6 @@
     <string name="about_contact_head">Contact</string>
     <string name="about_links_head">Links</string>
     <string name="settings_dark">Dark mode</string>
-    <string name="settings_dark_note">White on black, in this app. Home has one switch for every app.</string>
     <string name="settings_dark_on">On</string>
     <string name="settings_dark_off">Off</string>
     <string name="page_arrow_previous">Previous page</string>
