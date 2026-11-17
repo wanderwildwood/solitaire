@@ -225,6 +225,16 @@ class RulesTest {
         assertTrue(dealt.stock.isEmpty())
     }
 
+    @Test fun spiderDealsOverEmptyColumnsWhenTooFewCardsAreLeft() {
+        val r = Rules(Kind.SPIDER, 1)
+        val stock = List(10) { Card.of("5S").faceDown() }
+        // Nine cards on the table: ten columns can never all be filled.
+        val b = spider(List(9) { cards("KS") } + listOf(emptyList<Card>()), stock = stock)
+        assertFalse(r.stockBlocked(b))
+        val dealt = r.play(b, Move.Deal)!!
+        assertTrue(dealt.columns.all { it.isNotEmpty() })
+    }
+
     // ------------------------------------------------------------------ finishing
 
     @Test fun finishIsOfferedOnlyWhenEverythingIsUpAndItReallyFinishes() {

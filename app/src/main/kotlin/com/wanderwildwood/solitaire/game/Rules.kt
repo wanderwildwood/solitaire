@@ -195,9 +195,13 @@ class Rules(val kind: Kind, val option: Int) {
         return turnOver(next, col)
     }
 
-    /** Why the stock cannot be dealt from, if it cannot. */
+    /**
+     * Why the stock cannot be dealt from, if it cannot. A table holding fewer cards than there are
+     * columns can never fill them all, so it may deal over the empty ones.
+     */
     fun stockBlocked(b: Board): Boolean =
-        kind == Kind.SPIDER && b.stock.isNotEmpty() && b.columns.any { it.isEmpty() }
+        kind == Kind.SPIDER && b.stock.isNotEmpty() && b.columns.any { it.isEmpty() } &&
+            b.columns.sumOf { it.size } >= b.columns.size
 
     private fun dealStock(b: Board): Board? = when (kind) {
         Kind.FREECELL -> null
