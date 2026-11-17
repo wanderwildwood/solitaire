@@ -216,7 +216,8 @@ class RulesTest {
     @Test fun spiderWillNotDealOverAnEmptyColumn() {
         val r = Rules(Kind.SPIDER, 1)
         val stock = List(10) { Card.of("5S").faceDown() }
-        val b = spider(listOf(emptyList<Card>()) + List(9) { cards("KS") }, stock = stock)
+        // Eighteen cards on the table: enough to fill every column first.
+        val b = spider(listOf(emptyList<Card>()) + List(9) { cards("KS QS") }, stock = stock)
         assertTrue(r.stockBlocked(b))
         assertNull(r.play(b, Move.Deal))
         val filled = spider(List(10) { cards("KS") }, stock = stock)
