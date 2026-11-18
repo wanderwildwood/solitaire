@@ -13,7 +13,19 @@ import com.wanderwildwood.solitaire.game.Session
 class Store(context: Context) {
     private val prefs = context.getSharedPreferences("solitaire", Context.MODE_PRIVATE)
 
-    fun game(kind: Kind): Session? = prefs.getString("game_${kind.name}", null)?.let(Session::decode)
+    /**
+     * The saved game of [kind]. A save this version cannot replay exactly (a rule changed since,
+     * or the value was cut short) is first copied aside, once, under its own key so nothing can
+     * write over it, and the game goes on from the turns that still replay.
+     */
+    fun game(kind: Kind): Session? {
+        val key = "game_${kind.name}"
+        val saved = prefs.getString(key, null) ?: return null
+        Session.decode(saved)?.let { return it }
+        val aside = "${key}_unreadable"
+        if (!prefs.contains(aside)) prefs.edit().putString(aside, saved).commit()
+        return Session.salvage(saved)
+    }
 
     fun save(s: Session) {
         // commit, not apply: the next thing to happen may be the process being killed.

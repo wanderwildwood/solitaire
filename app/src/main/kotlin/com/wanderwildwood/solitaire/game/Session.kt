@@ -132,11 +132,33 @@ class Session private constructor(
         fun start(kind: Kind, option: Int, seed: Long) = Session(kind, option, seed, emptyList(), false)
 
         /** A saved game, or null if it cannot be read back exactly. */
-        fun decode(s: String): Session? = runCatching {
+        fun decode(s: String): Session? = read(s, exact = true)
+
+        /**
+         * As much of a saved game as still replays: its deal and its turns up to the first one that
+         * cannot be read or is no longer legal (a rule changed since it was saved, or the value was
+         * cut short). Null only when the deal itself cannot be read.
+         */
+        fun salvage(s: String): Session? = read(s, exact = false)
+
+        private fun read(s: String, exact: Boolean): Session? = runCatching {
             val f = s.split("|")
             require(f[0] == "1" && f.size == 6)
-            val turns = if (f[5].isEmpty()) emptyList() else f[5].split(";").map { t -> t.split(",").map(Move::decode) }
-            Session(Kind.valueOf(f[1]), f[2].toInt(), f[3].toLong(), turns, f[4] == "1")
+            val kind = Kind.valueOf(f[1])
+            val option = f[2].toInt()
+            val seed = f[3].toLong()
+            val counted = f[4] == "1"
+            val saved = if (f[5].isEmpty()) emptyList() else f[5].split(";")
+            if (exact) {
+                Session(kind, option, seed, saved.map { t -> t.split(",").map(Move::decode) }, counted)
+            } else {
+                val game = Session(kind, option, seed, emptyList(), counted)
+                for (t in saved) {
+                    val turn = runCatching { t.split(",").map(Move::decode) }.getOrNull() ?: break
+                    if (!runCatching { game.play(turn) }.getOrDefault(false)) break
+                }
+                game
+            }
         }.getOrNull()
     }
 }

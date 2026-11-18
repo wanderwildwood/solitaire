@@ -87,6 +87,27 @@ class SessionTest {
         assertNull(Session.decode("nonsense"))
     }
 
+    @Test fun aSaveThatNoLongerReplaysKeepsTheTurnsThatDo() {
+        val s = Session.start(Kind.KLONDIKE, 1, 42)
+        wander(s, Random(3), 60)
+        s.counted = true
+        assertTrue(s.moves > 5)
+        // A turn the rules refuse (a column onto itself), then one that cannot be read at all.
+        for (bad in listOf(s.encode() + ";c0.0>c0;d", s.encode() + ";x;d", s.encode().dropLast(1) + "c")) {
+            assertNull(Session.decode(bad))
+            val back = Session.salvage(bad)
+            assertNotNull(back)
+            back!!
+            assertTrue(back.counted)
+            assertEquals(s.seed, back.seed)
+            assertTrue(back.moves <= s.moves)
+            assertEquals(s.turns.take(back.moves), back.turns)
+            assertEquals(s.boards.take(back.moves + 1), back.boards)
+        }
+        assertEquals(s.turns, Session.salvage(s.encode() + ";c0.0>c0")!!.turns)
+        assertNull(Session.salvage("nonsense"))
+    }
+
     @Test fun tappingAgainCyclesThroughThePlacesAndBack() {
         // A one-suit Spider deal where some card fits on two columns.
         val r = Rules(Kind.SPIDER, 1)
