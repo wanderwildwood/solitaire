@@ -45,6 +45,8 @@
     <string name="deal_hint">1 to 32000</string>
     <string name="deal_out_of_range">Deals run from 1 to 32000.</string>
     <string name="deal_go">Deal</string>
+    <!-- The Deal button pressed once while a game is under way: a second press throws that game away -->
+    <string name="deal_go_armed">Deal — tap again</string>
     <string name="cancel">Cancel</string>
 
     <!-- What a screen reader says for a card. %1$s is the rank, %2$s the suit -->

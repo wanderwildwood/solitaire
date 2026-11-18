@@ -154,7 +154,13 @@ fun GameScreen(table: Table, onBack: () -> Unit) {
         }
     }
 
-    if (askDeal) DealDialog(onDeal = { table.freeCellDeal(it); askDeal = false }, onDismiss = { askDeal = false })
+    if (askDeal) {
+        DealDialog(
+            asksFirst = dealAsksFirst(table.session.won, table.session.moves),
+            onDeal = { table.freeCellDeal(it); askDeal = false },
+            onDismiss = { askDeal = false },
+        )
+    }
 }
 
 /** The row of buttons under the table. */
@@ -212,45 +218,63 @@ private fun Controls(table: Table, version: Int, onDeal: () -> Unit, clear: () -
     }
 }
 
+/**
+ * Whether a numbered deal has to be asked for twice: it throws away the game on the table, so a
+ * game under way (a move made, not yet won) gets the same "tap again" as New game.
+ */
+internal fun dealAsksFirst(won: Boolean, moves: Int): Boolean = !won && moves > 0
+
 /** FreeCell: a deal chosen by its number. */
 @Composable
-private fun DealDialog(onDeal: (Int) -> Unit, onDismiss: () -> Unit) {
+private fun DealDialog(asksFirst: Boolean, onDeal: (Int) -> Unit, onDismiss: () -> Unit) {
+    EInkDialog(onDismiss = onDismiss) {
+        // The dialog is its own window, so its armed Deal button needs a scope of its own.
+        ArmedScope { Column { DealDialogBody(asksFirst, onDeal, onDismiss) } }
+    }
+}
+
+@Composable
+private fun DealDialogBody(asksFirst: Boolean, onDeal: (Int) -> Unit, onDismiss: () -> Unit) {
     var text by remember { mutableStateOf("") }
     var wrong by remember { mutableStateOf(false) }
+    // Armed until something else happens: a tap elsewhere, or the number being changed.
+    var armed by rememberArmedFlag()
     val deal = {
         val n = text.toIntOrNull()
-        if (n == null || n !in 1..32000) wrong = true else onDeal(n)
+        when {
+            n == null || n !in 1..32000 -> wrong = true
+            asksFirst && !armed -> armed = true
+            else -> { armed = false; onDeal(n) }
+        }
     }
     val field = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
-    EInkDialog(onDismiss = onDismiss) {
-        // The number is what the dialog is for: the field takes the focus as it opens and the
-        // keyboard comes up. Asked from inside the dialog, a frame after it is drawn: the field
-        // lives in the dialog's own window, which a request from the screen beneath does not reach.
-        LaunchedEffect(Unit) {
-            withFrameNanos { }
-            runCatching { field.requestFocus() }
-            keyboard?.show()
-        }
-        TextMMD(text = stringResource(R.string.deal_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-        Spacer(Modifier.height(8.dp))
-        TextFieldMMD(
-            value = text,
-            onValueChange = { v -> text = v.filter { it.isDigit() }.take(5); wrong = false },
-            singleLine = true,
-            placeholder = { TextMMD(text = stringResource(R.string.deal_hint), style = MaterialTheme.typography.labelSmall) },
-            // Done on the keyboard is Deal.
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { deal() }),
-            modifier = Modifier.fillMaxWidth().focusRequester(field).testTag("dealfield"),
-        )
-        if (wrong) {
-            TextMMD(text = stringResource(R.string.deal_out_of_range), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 6.dp))
-        }
-        Spacer(Modifier.height(12.dp))
-        DialogButton(stringResource(R.string.deal_go), filled = true) { deal() }
-        DialogButton(stringResource(R.string.cancel), onClick = onDismiss)
+    // The number is what the dialog is for: the field takes the focus as it opens and the
+    // keyboard comes up. Asked from inside the dialog, a frame after it is drawn: the field
+    // lives in the dialog's own window, which a request from the screen beneath does not reach.
+    LaunchedEffect(Unit) {
+        withFrameNanos { }
+        runCatching { field.requestFocus() }
+        keyboard?.show()
     }
+    TextMMD(text = stringResource(R.string.deal_title), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+    Spacer(Modifier.height(8.dp))
+    TextFieldMMD(
+        value = text,
+        onValueChange = { v -> text = v.filter { it.isDigit() }.take(5); wrong = false; armed = false },
+        singleLine = true,
+        placeholder = { TextMMD(text = stringResource(R.string.deal_hint), style = MaterialTheme.typography.labelSmall) },
+        // Done on the keyboard is Deal.
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { deal() }),
+        modifier = Modifier.fillMaxWidth().focusRequester(field).testTag("dealfield"),
+    )
+    if (wrong) {
+        TextMMD(text = stringResource(R.string.deal_out_of_range), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 6.dp))
+    }
+    Spacer(Modifier.height(12.dp))
+    DialogButton(stringResource(if (armed) R.string.deal_go_armed else R.string.deal_go), filled = true) { deal() }
+    DialogButton(stringResource(R.string.cancel), onClick = onDismiss)
 }
 
 // ---------------------------------------------------------------------- the table
