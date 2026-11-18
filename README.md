@@ -38,7 +38,8 @@ device with Android 11 or later, Supernote's tablets among them.
   empty column.
 - **Spider.** Ten columns from two decks, in one, two or four suits (a setting). A run of one
   suit moves together; a king-to-ace run of one suit comes off the table by itself. Every
-  column needs a card before the next deal from the stock.
+  column needs a card before the next deal from the stock, unless fewer cards than columns are
+  left on the table.
 
 A setting changes the next new game, never the one under way. Settings also counts the games
 of each kind played and won. There is no timer and no score, only a count of moves.
@@ -49,6 +50,7 @@ Cards are white with a black edge. Hearts and diamonds are drawn in outline and 
 clubs filled, so the two colors read apart in grays. A fanned column shows only each card's
 rank and suit; a long column closes up its face-down cards first and then its face-up ones,
 so it never runs off the bottom of the screen and nothing scrolls. There is no hint button.
+Dark mode is a switch in Settings, and the app also follows the phone's dark setting.
 
 ## Building
 
