@@ -6,8 +6,8 @@ device with Android 11 or later, Supernote's tablets among them.
 
 | | |
 |---|---|
-| ![The list of games](screenshots/1-home.png) | ![Klondike under way](screenshots/2-klondike.png) |
-| ![Settings, and games played](screenshots/3-settings.png) | ![FreeCell under way](screenshots/4-freecell.png) |
+| ![Klondike under way](screenshots/1-klondike.png) | ![FreeCell under way](screenshots/2-freecell.png) |
+| ![Spider](screenshots/3-spider.png) | ![Settings, and games played](screenshots/4-settings.png) |
 
 ## Playing
 
